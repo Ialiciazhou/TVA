@@ -113,5 +113,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: TVA-windows
-          path: output/*.exe
+          path: "output/*.exe"
 EOF
