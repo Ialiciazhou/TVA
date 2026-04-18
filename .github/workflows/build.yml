@@ -68,4 +68,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: TVA-windows
-          path: "output/*.exe"
+          path: "final/*.exe"
