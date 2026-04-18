@@ -51,26 +51,13 @@ jobs:
           mkdir dist
           cp jar/TVA.jar dist/
           Copy-Item javafx-sdk-20.0.2/bin/*.dll dist/
-      - name: Create app-image
+      - name: Package EXE
         run: |
           mkdir output
-          jpackage --input dist --main-jar TVA.jar --main-class pobj.TVA.TVA --name TVA --app-version 1.0.0 --dest output --module-path javafx-sdk-20.0.2/lib --runtime-image "$env:JAVA_HOME_20_X64" --type app-image
+          jpackage --input dist --main-jar TVA.jar --main-class pobj.TVA.TVA --name TVA --app-version 1.0.0 --dest output --module-path javafx-sdk-20.0.2/lib --runtime-image "$env:JAVA_HOME_20_X64" --java-options "-Djava.library.path=app" --type exe
 
-      - name: Fix DLL location
-        run: |
-          Copy-Item javafx-sdk-20.0.2/bin/*.dll "output\TVA\runtime\bin\"
-      - name: Check DLL in runtime
-        run: dir output\TVA\runtime\bin\prism*
-      - name: Check glass DLL
-        run: dir javafx-sdk-20.0.2/bin/glass*
-      - name: Check glass in runtime
-        run: dir output\TVA\runtime\bin\glass*
-      - name: Create EXE from app-image
-        run: |
-          mkdir final
-          jpackage --app-image output\TVA --name TVA --app-version 1.0.0 --dest final --type exe
       - name: Upload EXE
         uses: actions/upload-artifact@v4
         with:
           name: TVA-windows
-          path: "final/*.exe"
+          path: "output/*.exe"
