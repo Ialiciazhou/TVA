@@ -51,17 +51,19 @@ jobs:
           mkdir dist
           cp jar/TVA.jar dist/
           Copy-Item javafx-sdk-20.0.2/bin/*.dll dist/
-      - name: Package EXE
+      - name: Create app-image
         run: |
           mkdir output
-          $env:JAVA_HOME = "$env:JAVA_HOME_20_X64"
-          jpackage --input dist --main-jar TVA.jar --main-class pobj.TVA.TVA --name TVA --app-version 1.0.0 --dest output --module-path javafx-sdk-20.0.2/lib --runtime-image "$env:JAVA_HOME_20_X64" --java-options "-Djava.library.path=app" --java-options "-Dprism.verbose=true" --java-options "-Djavafx.verbose=true" --java-options "-Dprism.order=d3d,sw" --type exe
+          jpackage --input dist --main-jar TVA.jar --main-class pobj.TVA.TVA --name TVA --app-version 1.0.0 --dest output --module-path javafx-sdk-20.0.2/lib --runtime-image "$env:JAVA_HOME_20_X64" --type app-image
+
       - name: Fix DLL location
         run: |
-          dir output
-          $installDir = (Get-ChildItem output -Directory | Select-Object -First 1).FullName
-          Write-Host "Install dir: $installDir"
-          Copy-Item javafx-sdk-20.0.2/bin/*.dll "$installDir\runtime\bin\"
+          Copy-Item javafx-sdk-20.0.2/bin/*.dll "output\TVA\runtime\bin\"
+
+      - name: Create EXE from app-image
+        run: |
+          mkdir final
+          jpackage --app-image output\TVA --name TVA --app-version 1.0.0 --dest final --type exe
       - name: Upload EXE
         uses: actions/upload-artifact@v4
         with:
