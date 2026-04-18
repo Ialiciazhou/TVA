@@ -95,10 +95,15 @@ jobs:
           Copy-Item javafx-sdk-20.0.2/lib/*.dll dist/
           Copy-Item javafx-sdk-20.0.2/lib/*.jar dist/
 
+      - name: Check dist content
+        run: |
+          dir dist
+          dir javafx-sdk-20.0.2/lib
+
       - name: Package EXE
         run: |
           mkdir output
-            jpackage --input dist --main-jar TVA.jar --main-class pobj.TVA.TVA --name TVA --app-version 1.0.0 --dest output --module-path javafx-sdk-20.0.2/lib --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.graphics --java-options "-Djava.library.path=app" --type exe
+          jpackage --input dist --main-jar TVA.jar --main-class pobj.TVA.TVA --name TVA --app-version 1.0.0 --dest output --module-path javafx-sdk-20.0.2/lib --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.graphics --java-options "-Dprism.verbose=true" --java-options "-Djava.library.path=." --type exe
 
       - name: Upload EXE
         uses: actions/upload-artifact@v4
