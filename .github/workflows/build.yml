@@ -59,7 +59,8 @@ jobs:
       - name: Fix DLL location
         run: |
           Copy-Item javafx-sdk-20.0.2/bin/*.dll "output\TVA\runtime\bin\"
-
+      - name: Check DLL in runtime
+        run: dir output\TVA\runtime\bin\prism*
       - name: Create EXE from app-image
         run: |
           mkdir final
