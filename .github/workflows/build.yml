@@ -91,22 +91,23 @@ jobs:
               -C dist .
 
       - name: Copy JavaFX native libs
-        run: Copy-Item javafx-sdk-20.0.2/lib/*.dll dist/
+        run: |
+          Copy-Item javafx-sdk-20.0.2/lib/*.dll dist/
+          Copy-Item javafx-sdk-20.0.2/lib/*.jar dist/
 
       - name: Package EXE
         run: |
           mkdir output
-          jpackage `
-            --input dist `
-            --main-jar TVA.jar `
-            --main-class pobj.TVA.TVA `
-            --name TVA `
-            --app-version 1.0.0 `
-            --dest output `
-            --module-path javafx-sdk-20.0.2/lib `
-            --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.graphics `
-            --java-options "--module-path $env:APPDATA\TVA\runtime\lib --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.graphics" `
-            --java-options "-Djava.library.path=$env:APPDATA\TVA\runtime\lib" `
+          jpackage
+            --input dist
+            --main-jar TVA.jar
+            --main-class pobj.TVA.TVA
+            --name TVA
+            --app-version 1.0.0
+            --dest output
+            --module-path javafx-sdk-20.0.2/lib
+            --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.graphics
+            --java-options "-Djava.library.path=$APPDATA\TVA\app"
             --type exe
 
       - name: Upload EXE
