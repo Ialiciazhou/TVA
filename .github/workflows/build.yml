@@ -63,6 +63,8 @@ jobs:
         run: dir output\TVA\runtime\bin\prism*
       - name: Check glass DLL
         run: dir javafx-sdk-20.0.2/bin/glass*
+      - name: Check glass in runtime
+        run: dir output\TVA\runtime\bin\glass*
       - name: Create EXE from app-image
         run: |
           mkdir final
