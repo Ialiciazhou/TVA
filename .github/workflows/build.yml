@@ -86,6 +86,9 @@ jobs:
           Copy-Item javafx-sdk-20.0.2/lib/*.dll dist/
           Copy-Item javafx-sdk-20.0.2/lib/*.jar dist/
 
+      - name: Check dist DLL
+        run: dir dist
+        
       - name: Check dist content
         run: |
           dir dist
