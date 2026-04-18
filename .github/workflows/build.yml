@@ -1,1 +1,117 @@
-name: Build TVA
+name: Build TVA Installers
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Java 20
+        uses: actions/setup-java@v3
+        with:
+          java-version: '20'
+          distribution: 'temurin'
+
+      - name: Download JavaFX SDK Linux
+        run: |
+          wget https://download2.gluonhq.com/openjfx/20.0.2/openjfx-20.0.2_linux-x64_bin-sdk.zip
+          unzip openjfx-20.0.2_linux-x64_bin-sdk.zip
+
+      - name: Compile
+        run: |
+          mkdir -p dist
+          javac --module-path javafx-sdk-20.0.2/lib \
+                --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.graphics \
+                -d dist \
+                src/pobj/TVA/TVA.java
+
+      - name: Create JAR
+        run: |
+          jar --create --file dist/TVA.jar \
+              --main-class pobj.TVA.TVA \
+              -C dist .
+
+      - name: Copy JavaFX native libs
+        run: cp javafx-sdk-20.0.2/lib/*.so dist/
+
+      - name: Package DEB
+        run: |
+          mkdir -p output
+          jpackage \
+            --input dist \
+            --main-jar TVA.jar \
+            --main-class pobj.TVA.TVA \
+            --name TVA \
+            --app-version 1.0.0 \
+            --dest output \
+            --module-path javafx-sdk-20.0.2/lib \
+            --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.graphics \
+            --java-options "--module-path /opt/tva/lib/runtime/lib --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.graphics" \
+            --java-options "-Djava.library.path=/opt/tva/lib/runtime/lib" \
+            --type deb
+
+      - name: Upload DEB
+        uses: actions/upload-artifact@v3
+        with:
+          name: TVA-linux
+          path: output/*.deb
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Java 20
+        uses: actions/setup-java@v3
+        with:
+          java-version: '20'
+          distribution: 'temurin'
+
+      - name: Download JavaFX SDK Windows
+        run: |
+          curl -L -o javafx.zip https://download2.gluonhq.com/openjfx/20.0.2/openjfx-20.0.2_windows-x64_bin-sdk.zip
+          Expand-Archive javafx.zip .
+
+      - name: Compile
+        run: |
+          mkdir dist
+          javac --module-path javafx-sdk-20.0.2/lib `
+                --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.graphics `
+                -d dist `
+                src/pobj/TVA/TVA.java
+
+      - name: Create JAR
+        run: |
+          jar --create --file dist/TVA.jar `
+              --main-class pobj.TVA.TVA `
+              -C dist .
+
+      - name: Copy JavaFX native libs
+        run: Copy-Item javafx-sdk-20.0.2/lib/*.dll dist/
+
+      - name: Package EXE
+        run: |
+          mkdir output
+          jpackage `
+            --input dist `
+            --main-jar TVA.jar `
+            --main-class pobj.TVA.TVA `
+            --name TVA `
+            --app-version 1.0.0 `
+            --dest output `
+            --module-path javafx-sdk-20.0.2/lib `
+            --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.graphics `
+            --java-options "--module-path $env:APPDATA\TVA\runtime\lib --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.graphics" `
+            --java-options "-Djava.library.path=$env:APPDATA\TVA\runtime\lib" `
+            --type exe
+
+      - name: Upload EXE
+        uses: actions/upload-artifact@v3
+        with:
+          name: TVA-windows
+          path: output/*.exe
+EOF
