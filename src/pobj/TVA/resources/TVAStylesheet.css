@@ -1,0 +1,108 @@
+.root {
+   nameOption-colour: #a04000;
+   TVA-colour: #B500FF;
+   HT-colour: #00DB2B;
+   TTC-colour: #D92500;
+  
+}
+
+.border-box{
+   -fx-background-color: lightyellow;
+  /** -fx-background-color: linear-gradient(to right,rgba(255, 255, 224, 1), rgba(252, 176, 69, 1));  **/
+   -fx-padding: 10px;
+}
+
+.hbox{
+ -fx-spacing:10px;
+ -fx-padding: 20px;
+ -fx-marging-left: 50px;
+
+}
+.results-box{
+   -fx-width: 30px;
+   -fx-height: 10px;
+   -fx-border-color: grey;
+   -fx-border-radius: 6px;
+   -fx-border-width: 3px;
+   -fx-spacing:10px;
+}
+
+.input-textfield {
+    -fx-background-color: -fx-text-box-border, -fx-background ;
+    -fx-background-insets: 0, 0 0 1 0 ;
+    -fx-background-radius: 0 ;
+    -fx-font-size: 18px;
+}
+.input-textfield:focused {
+    -fx-background-color: -fx-focus-color, -fx-background ;
+    
+}
+
+.calculation-button{
+    -fx-background-insets: 0,1,4,5;
+    -fx-padding: 15 30 15 30;
+    -fx-font-family: "Helvetica";
+    -fx-font-size: 18px;
+    -fx-text-fill: #333333;
+    -fx-effect: dropshadow( one-pass-box , black , 8 , 0.0 , 2 , 0 );
+    -fx-font-weight: bold;
+    -fx-text-fill: #006464;
+    -fx-background-color: #DFB951;
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-padding: 5;
+    
+}
+
+.calculation-button:hover { 
+    /* Your new css */
+}
+
+.calculation-button:pressed {
+    /* Your new css */
+}
+
+.option-button{
+    -fx-effect: dropshadow( one-pass-box , black , 8 , 0.0 , 2 , 0 );
+   -fx-font-weight: bold;
+   -fx-text-fill: #006464;
+   -fx-background-color: #DFB951;
+   -fx-border-radius: 20;
+   -fx-background-radius: 20;
+   -fx-padding: 5;
+   
+}
+
+.calculation-button:hover { 
+    /* Your new css */
+}
+
+.calculation-button:pressed {
+    /* Your new css */
+}
+
+.TVA-label{
+   -fx-text-fill: TVA-colour;
+   -fx-font-weight: bold;
+   -fx-font-size: 32px;
+}
+
+.TTC-label{
+   -fx-text-fill: TTC-colour;
+   -fx-font-weight: bold;
+   -fx-font-size: 32px;
+}
+
+.HT-label{
+   -fx-text-fill: HT-colour;	
+   -fx-font-weight: bold;
+   -fx-font-size: 32px;
+}
+
+
+.nameOption-label {
+   -fx-text-fill: nameOption-colour;
+   -fx-font-size: 16px;
+   -fx-font-weight: bold;
+}
+
