@@ -54,14 +54,16 @@ jobs:
       - name: Create app-image
         run: |
           mkdir output
-          jpackage --input dist --main-jar TVA.jar --main-class pobj.TVA.TVA --name TVA --app-version 1.0.0 --dest output --module-path javafx-sdk-20.0.2/lib --runtime-image "$env:JAVA_HOME_20_X64" --icon src/pobj/TVA/resources/ICON.ico --type app-image
-      - name: Fix DLL location
+          jpackage --input dist --main-jar TVA.jar --main-class pobj.TVA.TVA --name TVA --app-version 1.0.0 --dest output --module-path javafx-sdk-20.0.2/lib --runtime-image "$env:JAVA_HOME_20_X64" --icon src/pobj/TVA/resources/ICON.ico --java-options "-Djava.library.path=app" --type app-image
+
+      - name: Fix DLL in app
         run: |
-          Copy-Item javafx-sdk-20.0.2/bin/*.dll "output\TVA\runtime\bin\"
+          Copy-Item javafx-sdk-20.0.2/bin/*.dll "output\TVA\app\"
+
       - name: Create EXE from app-image
         run: |
           mkdir final
-          jpackage --app-image output\TVA --icon src/pobj/TVA/resources/ICON.ico --name TVA --app-version 1.0.0 --dest final --icon src/pobj/TVA/resources/ICON.ico --type exe
+          jpackage --app-image output\TVA --name TVA --app-version 1.0.0 --dest final --icon src/pobj/TVA/resources/ICON.ico --type exe
       - name: Upload EXE
         uses: actions/upload-artifact@v4
         with:
