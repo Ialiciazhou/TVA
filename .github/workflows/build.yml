@@ -59,13 +59,10 @@ jobs:
         run: |
           Remove-Item "output\TVA\TVA.exe"
           Rename-Item "output\TVA\TVALauncher.exe" "TVA.exe"
+      - name: Check output structure
+        run: dir output /s /b
       - name: Upload EXE
         uses: actions/upload-artifact@v4
         with:
           name: TVA-windows
           path: "output/*.exe"
-      - name: Upload EXE
-        uses: actions/upload-artifact@v4
-        with:
-          name: TVA-windows
-          path: "final/*.exe"
