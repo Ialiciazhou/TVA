@@ -33,7 +33,7 @@ jobs:
           name: TVA-linux
           path: "output/*.deb"
 
-build-windows:
+  build-windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
