@@ -26,14 +26,14 @@ jobs:
       - name: Package DEB
         run: |
           mkdir -p output
-          jpackage --input dist --main-jar TVA.jar --main-class pobj.TVA.TVA --name TVA --app-version 1.0.0 --dest output --module-path javafx-sdk-20.0.2/lib --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.graphics --java-options "-Djava.library.path=/opt/tva/lib/runtime/lib" --type deb
+          jpackage --input dist --icon src/pobj/TVA/resources/ICON.png --main-jar TVA.jar --main-class pobj.TVA.TVA --name TVA --app-version 1.0.0 --dest output --module-path javafx-sdk-20.0.2/lib --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.graphics --java-options "-Djava.library.path=/opt/tva/lib/runtime/lib" --type deb
       - name: Upload DEB
         uses: actions/upload-artifact@v4
         with:
           name: TVA-linux
           path: "output/*.deb"
 
-  build-windows:
+build-windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -51,12 +51,19 @@ jobs:
           mkdir dist
           cp jar/TVA.jar dist/
           Copy-Item javafx-sdk-20.0.2/bin/*.dll dist/
-      - name: Package EXE
+      - name: Create app-image
         run: |
           mkdir output
-          jpackage --input dist --main-jar TVA.jar --main-class pobj.TVA.TVA --name TVA --app-version 1.0.0 --dest output --module-path javafx-sdk-20.0.2/lib --runtime-image "$env:JAVA_HOME_20_X64" --add-launcher TVALauncher=launcher/TVA.properties --type exe
+          jpackage --input dist --main-jar TVA.jar --main-class pobj.TVA.TVA --name TVA --app-version 1.0.0 --dest output --module-path javafx-sdk-20.0.2/lib --runtime-image "$env:JAVA_HOME_20_X64" --icon src/pobj/TVA/resources/ICON.ico --type app-image
+      - name: Fix DLL location
+        run: |
+          Copy-Item javafx-sdk-20.0.2/bin/*.dll "output\TVA\runtime\bin\"
+      - name: Create EXE from app-image
+        run: |
+          mkdir final
+          jpackage --app-image output\TVA --icon src/pobj/TVA/resources/ICON.ico --name TVA --app-version 1.0.0 --dest final --icon src/pobj/TVA/resources/ICON.ico --type exe
       - name: Upload EXE
         uses: actions/upload-artifact@v4
         with:
           name: TVA-windows
-          path: "output/*.exe"
+          path: "final/*.exe"
