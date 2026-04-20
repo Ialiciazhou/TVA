@@ -51,19 +51,23 @@ jobs:
           mkdir dist
           cp jar/TVA.jar dist/
           Copy-Item javafx-sdk-20.0.2/bin/*.dll dist/
-      - name: Package EXE
+      - name: Create app-image
         run: |
           mkdir output
-          jpackage --input dist --main-jar TVA.jar --main-class pobj.TVA.TVA --name TVA --app-version 1.0.0 --dest output --module-path javafx-sdk-20.0.2/lib --runtime-image "$env:JAVA_HOME_20_X64" --icon src/pobj/TVA/resources/ICON.ico --add-launcher TVALauncher=launcher/TVA.properties --type exe
-      - name: Check output structure
-        run: Get-ChildItem output -Recurse
-      - name: Rename launcher
+          jpackage --input dist --main-jar TVA.jar --main-class pobj.TVA.TVA --name TVA --app-version 1.0.0 --dest output --module-path javafx-sdk-20.0.2/lib --runtime-image "$env:JAVA_HOME_20_X64" --icon src/pobj/TVA/resources/ICON.ico --add-launcher TVALauncher=launcher/TVA.properties --type app-image
+
+      - name: Fix executables
         run: |
-          Remove-Item "output\TVA.exe"
-          Rename-Item "output\TVALauncher.exe" "TVA.exe"
+          Remove-Item "output\TVA\TVA.exe"
+          Rename-Item "output\TVA\TVALauncher.exe" "TVA.exe"
+
+      - name: Create EXE installer
+        run: |
+          mkdir final
+          jpackage --app-image output\TVA --name TVA --app-version 1.0.0 --dest final --icon src/pobj/TVA/resources/ICON.ico --type exe
 
       - name: Upload EXE
         uses: actions/upload-artifact@v4
         with:
           name: TVA-windows
-          path: "output/*.exe"
+          path: "final/*.exe"
