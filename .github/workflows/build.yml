@@ -56,7 +56,7 @@ jobs:
           mkdir output
           jpackage --input dist --main-jar TVA.jar --main-class pobj.TVA.TVA --name TVA --app-version 1.0.0 --dest output --module-path javafx-sdk-20.0.2/lib --runtime-image "$env:JAVA_HOME_20_X64" --icon src/pobj/TVA/resources/ICON.ico --add-launcher TVALauncher=launcher/TVA.properties --type exe
       - name: Check output structure
-        run: dir output /s /b
+        run: Get-ChildItem output -Recurse
       - name: Rename launcher
         run: |
           Remove-Item "output\TVA.exe"
