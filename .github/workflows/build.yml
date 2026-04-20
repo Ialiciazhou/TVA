@@ -54,7 +54,7 @@ jobs:
       - name: Package EXE
         run: |
           mkdir output
-          jpackage --input dist --main-jar TVA.jar --main-class pobj.TVA.TVA --name TVA --app-version 1.0.0 --dest output --module-path javafx-sdk-20.0.2/lib --runtime-image "$env:JAVA_HOME_20_X64" --java-options "-Djava.library.path=app" --type exe
+          jpackage --input dist --main-jar TVA.jar --main-class pobj.TVA.TVA --name TVA --app-version 1.0.0 --dest output --module-path javafx-sdk-20.0.2/lib --runtime-image "$env:JAVA_HOME_20_X64" --add-launcher TVA=launcher/TVA.properties --type exe
 
       - name: Upload EXE
         uses: actions/upload-artifact@v4
