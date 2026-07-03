@@ -157,7 +157,7 @@ public class TVA extends Application{
 			
 			btn.setText("Copié !");
 			btn.setDisable(true);
-			
+			// attend 1.5s avant de recopier
 			PauseTransition pause = new PauseTransition(Duration.seconds(1.5));
 			pause.setOnFinished(e -> {
 				btn.setText("Copier");
