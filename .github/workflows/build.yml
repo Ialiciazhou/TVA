@@ -2,61 +2,180 @@ name: Build TVA Installers
 
 on:
   push:
-    branches: [ main ]
+    tags:
+      - 'v*'        # déclenche sur les tags v1.0, v1.1, v2.0, etc.
 
 jobs:
+  # ============ LINUX (.deb) ============
   build-linux:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Install Java 20
         uses: actions/setup-java@v3
         with:
           java-version: '20'
           distribution: 'temurin'
-      - name: Download JavaFX SDK Linux
+
+      - name: Install JavaFX SDK
         run: |
-          wget https://download2.gluonhq.com/openjfx/20.0.2/openjfx-20.0.2_linux-x64_bin-sdk.zip
-          unzip openjfx-20.0.2_linux-x64_bin-sdk.zip
+          wget -q https://download2.gluonhq.com/openjfx/20.0.2/openjfx-20.0.2_linux-x64_bin-sdk.zip
+          unzip -q openjfx-20.0.2_linux-x64_bin-sdk.zip
+
       - name: Prepare dist
         run: |
           mkdir -p dist
           cp jar/TVA.jar dist/
-          cp javafx-sdk-20.0.2/lib/*.so dist/
-      - name: Package DEB
+
+      - name: Package with jpackage
         run: |
           mkdir -p output
-          jpackage --input dist --icon src/pobj/TVA/resources/ICON.png --main-jar TVA.jar --main-class pobj.TVA.TVA --name TVA --app-version 1.0.0 --dest output --module-path javafx-sdk-20.0.2/lib --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.graphics --java-options "-Djava.library.path=/opt/tva/lib/runtime/lib" --type deb
+          jpackage \
+            --input dist \
+            --main-jar TVA.jar \
+            --main-class pobj.TVA.TVA \
+            --name TVA \
+            --app-version ${GITHUB_REF_NAME#v} \
+            --vendor "Alicia" \
+            --icon src/pobj/TVA/resources/ICON.png \
+            --module-path javafx-sdk-20.0.2/lib \
+            --add-modules javafx.controls,javafx.fxml \
+            --type deb \
+            --dest output
+
       - name: Upload DEB
         uses: actions/upload-artifact@v4
         with:
-          name: TVA-linux
-          path: "output/*.deb"
+          name: TVA-linux-deb
+          path: output/*.deb
 
+  # ============ WINDOWS (.exe + .msi) ============
   build-windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Install Java 20
         uses: actions/setup-java@v3
         with:
           java-version: '20'
           distribution: 'temurin'
-      - name: Download JavaFX SDK Windows
+
+      - name: Install JavaFX SDK
+        shell: bash
         run: |
-          curl -L -o javafx.zip https://download2.gluonhq.com/openjfx/20.0.2/openjfx-20.0.2_windows-x64_bin-sdk.zip
-          Expand-Archive javafx.zip .
+          curl -sL -o javafx.zip https://download2.gluonhq.com/openjfx/20.0.2/openjfx-20.0.2_windows-x64_bin-sdk.zip
+          unzip -q javafx.zip
+
       - name: Prepare dist
+        shell: bash
         run: |
-          mkdir dist
+          mkdir -p dist
           cp jar/TVA.jar dist/
-          Copy-Item javafx-sdk-20.0.2/bin/*.dll dist/
+
       - name: Package EXE
+        shell: bash
         run: |
-          mkdir output
-          jpackage --input dist --main-jar TVA.jar --main-class pobj.TVA.TVA --name TVA --app-version 1.0.0 --dest output --module-path javafx-sdk-20.0.2/lib --runtime-image "$env:JAVA_HOME_20_X64" --icon src/pobj/TVA/resources/ICON.ico --java-options "--module-path $APPDIR/mods --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.graphics -Djava.library.path=$ROOTDIR/app" --type exe
+          mkdir -p output
+          jpackage \
+            --input dist \
+            --main-jar TVA.jar \
+            --main-class pobj.TVA.TVA \
+            --name TVA \
+            --app-version ${GITHUB_REF_NAME#v} \
+            --vendor "Alicia" \
+            --icon src/pobj/TVA/resources/ICON.ico \
+            --module-path javafx-sdk-20.0.2/lib \
+            --add-modules javafx.controls,javafx.fxml \
+            --type exe \
+            --dest output
+
       - name: Upload EXE
         uses: actions/upload-artifact@v4
         with:
-          name: TVA-windows
-          path: "output/*.exe"
+          name: TVA-windows-exe
+          path: output/*.exe
+
+  # ============ MACOS (.dmg + .app) ============
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Java 20
+        uses: actions/setup-java@v3
+        with:
+          java-version: '20'
+          distribution: 'temurin'
+
+      - name: Install JavaFX SDK
+        run: |
+          curl -sL -o javafx.zip https://download2.gluonhq.com/openjfx/20.0.2/openjfx-20.0.2_osx-x64_bin-sdk.zip
+          unzip -q javafx.zip
+
+      - name: Prepare dist
+        run: |
+          mkdir -p dist
+          cp jar/TVA.jar dist/
+
+      - name: Package DMG
+        run: |
+          mkdir -p output
+          jpackage \
+            --input dist \
+            --main-jar TVA.jar \
+            --main-class pobj.TVA.TVA \
+            --name TVA \
+            --app-version ${GITHUB_REF_NAME#v} \
+            --vendor "Alicia" \
+            --icon src/pobj/TVA/resources/ICON.icns \
+            --module-path javafx-sdk-20.0.2/lib \
+            --add-modules javafx.controls,javafx.fxml \
+            --type dmg \
+            --dest output
+
+      - name: Upload DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: TVA-macos-dmg
+          path: output/*.dmg
+
+  # ============ RELEASE GITHUB ============
+  release:
+    needs: [build-linux, build-windows, build-macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # pour créer la release
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: TVA ${{ github.ref_name }}
+          body: |
+            ## 🎉 TVA ${{ github.ref_name }}
+            
+            Calculateur de TVA (HT/TVA/TTC) en JavaFX.
+            
+            ### Téléchargements
+            
+            -  **Linux** : `TVA-linux-deb` (.deb)
+            -  **Windows** : `TVA-windows-exe` (.exe)
+            -  **macOS** : `TVA-macos-dmg` (.dmg)
+            
+            ###  Installation
+            
+            - **Linux** : `sudo dpkg -i TVA_*.deb`
+            - **Windows** : double-clic sur l'installateur
+            - **macOS** : ouvrir le .dmg et glisser l'app dans Applications
+          files: |
+            artifacts/TVA-linux-deb/*.deb
+            artifacts/TVA-windows-exe/*.exe
+            artifacts/TVA-macos-dmg/*.dmg
+          draft: false
+          prerelease: false
