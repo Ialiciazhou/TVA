@@ -55,11 +55,11 @@
 }
 
 .calculation-button:hover { 
-    /* Your new css */
+    /* A FAIRE */
 }
 
 .calculation-button:pressed {
-    /* Your new css */
+    /* A FAIRE */
 }
 
 .option-button{
@@ -73,13 +73,6 @@
    
 }
 
-.calculation-button:hover { 
-    /* Your new css */
-}
-
-.calculation-button:pressed {
-    /* Your new css */
-}
 
 .TVA-label{
    -fx-text-fill: TVA-colour;
@@ -104,5 +97,24 @@
    -fx-text-fill: nameOption-colour;
    -fx-font-size: 16px;
    -fx-font-weight: bold;
+}
+
+.copy-button{
+   -fx-background-color: #DFB951 ;
+   -fx-border-color: #DFB951 ;
+   -fx-text-fill: #006464;
+   -fx-background-radius: 6 ;
+   -fx-border-radius: 6 ;
+   -fx-padding: 4 8 ;
+   -fx-cursor: hand ;
+   -fx-font-size: 14px;
+}
+
+.copy-button:hover{
+   -fx-background-color: #DFB9F1 ;
+}
+
+.copy-button:pressed{
+   -fx-background-color: #DFB9F1 ;
 }
 

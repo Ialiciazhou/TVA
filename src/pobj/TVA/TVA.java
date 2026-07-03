@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.function.UnaryOperator;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -14,12 +15,16 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import javafx.util.converter.DoubleStringConverter;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
@@ -48,7 +53,7 @@ public class TVA extends Application{
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		primaryStage.setTitle("Calcul TVA");
-		primaryStage.getIcons().add(new Image("file:resources/ICON.pnj"));
+		primaryStage.getIcons().add(new Image("file:resources/ICON.png"));
 		Scene scene = new Scene(createContent(),width,height);   // ARG A REMPLACER 
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -139,14 +144,39 @@ public class TVA extends Application{
 		return results;
 	}
 	
+	private Node createResultsRow(String name, StringProperty source) {
+		Label lbl = styledLabel("", name + "-label");
+		lbl.textProperty().bind(source);
+		
+		Button btn = styledButton("Copier","copy-button");
+		btn.setTooltip(new Tooltip("Copier " + name));
+		btn.setOnAction(evt -> {
+			ClipboardContent cc = new ClipboardContent();
+			cc.putString(lbl.getText().replaceAll("[^0-9.,]", "").replace(".",","));
+			Clipboard.getSystemClipboard().setContent(cc);
+			
+			btn.setText("Copié !");
+			btn.setDisable(true);
+			
+			PauseTransition pause = new PauseTransition(Duration.seconds(1.5));
+			pause.setOnFinished(e -> {
+				btn.setText("Copier");
+				btn.setDisable(false);
+			});
+			pause.play();
+		});
+		
+		HBox results = new HBox(10,btn,lbl);
+		results.setAlignment(Pos.CENTER);
+		return results;
+	}
+	
 	/**
 	 * resultats HT
 	 * @return les resultats
 	 */
 	private Node createHTLabel() {
-		Label results = styledLabel("","HT-label");
-		results.textProperty().bind(HT);
-		return results;
+		return createResultsRow("HT",HT);
 	}
 	
 	/**
@@ -154,9 +184,7 @@ public class TVA extends Application{
 	 * @return les resultats
 	 */
 	private Node createTVALabel() {
-		Label results = styledLabel("","TVA-label");
-		results.textProperty().bind(TVA);
-		return results;
+		return createResultsRow("TVA",TVA);
 	}
 	
 	/**
@@ -164,9 +192,7 @@ public class TVA extends Application{
 	 * @return les resultats
 	 */
 	private Node createTTCLabel() {
-		Label results = styledLabel("","TTC-label");
-		results.textProperty().bind(TTC);
-		return results;
+		return createResultsRow("TTC",TTC);
 	}
 	
 	
@@ -209,7 +235,7 @@ public class TVA extends Application{
 		}
 		
 		
-		TVA.set("TVA (20%) : " + round(val,2) + " €");
+		TVA.set("TVA : " + round(val,2) + " €");
 	}
 	
 	
